@@ -51,8 +51,13 @@ app.get('/api/persons/:id', (request, response) => {
             error: 'Person not found'
         });
     }
+})
 
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+    persons = persons.filter(person => person.id !== id)
 
+    response.status(204).end()
 })
 
 
@@ -62,16 +67,6 @@ app.get('/api/persons/:id', (request, response) => {
 
 /*
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = persons.find(note => note.id === id)
-
-    if (note) {
-        response.json(note)
-    } else {
-        response.status(404).end()
-    }
-})
 
 const generateId = () => {
     const maxId = persons.length > 0
@@ -99,13 +94,6 @@ app.post('/api/persons', (request, response) => {
     persons = persons.concat(note)
 
     response.json(note)
-})
-
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(note => note.id !== id)
-
-    response.status(204).end()
 })
 
 */
