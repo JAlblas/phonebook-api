@@ -60,6 +60,18 @@ const generateId = () => {
 app.post('/api/persons', (request, response) => {
     const body = request.body;
 
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'name or number missing'
+        })
+    }
+
+    if (persons.find(person => person.name === body.name)) {
+        return response.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+
     const newPerson = {
         'id': generateId(),
         'name': body.name,
@@ -71,30 +83,6 @@ app.post('/api/persons', (request, response) => {
     response.json(newPerson);
 })
 
-/*
-
-
-app.post('/api/persons', (request, response) => {
-    const body = request.body
-
-    if (!body.content) {
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
-
-    const note = {
-        content: body.content,
-        important: body.important || false,
-        date: new Date(),
-        id: generateId(),
-    }
-
-    persons = persons.concat(note)
-
-    response.json(note)
-})
-*/
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id);
