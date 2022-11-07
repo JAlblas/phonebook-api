@@ -53,27 +53,26 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id);
-    persons = persons.filter(person => person.id !== id)
+const generateId = () => {
+    return Math.floor(Math.random() * 1000000000);
+}
 
-    response.status(204).end()
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+
+    const newPerson = {
+        'id': generateId(),
+        'name': body.name,
+        'number': body.number
+    }
+
+    persons = persons.concat(newPerson);
+
+    response.json(newPerson);
 })
-
-
-
-
-
 
 /*
 
-
-const generateId = () => {
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(n => n.id))
-        : 0
-    return maxId + 1
-}
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -95,8 +94,14 @@ app.post('/api/persons', (request, response) => {
 
     response.json(note)
 })
-
 */
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id);
+    persons = persons.filter(person => person.id !== id)
+
+    response.status(204).end()
+})
 
 const PORT = 3001
 app.listen(PORT, () => {
