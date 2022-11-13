@@ -1,6 +1,9 @@
 const express = require('express')
 const morgan = require('morgan');
 const cors = require('cors')
+const mongoose = require('mongoose')
+
+require('dotenv').config();
 
 const app = express()
 
@@ -11,28 +14,27 @@ app.use(cors())
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body - :req[content-length]'));
 
-let persons = [
-    {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
+const password = process.env.DB_PASS;
+const url = `mongodb+srv://jasper:${password}@cluster1.gmcixyl.mongodb.net/phonebook?retryWrites=true&w=majority`
+
+console.log(url);
+
+mongoose.connect(url)
+
+const personSchema = new mongoose.Schema({
+    name: String,
+    number: String
+})
+
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
     }
-]
+})
+
+const Person = mongoose.model('Person', personSchema)
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -45,7 +47,9 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
